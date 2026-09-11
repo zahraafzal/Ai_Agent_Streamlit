@@ -78,37 +78,44 @@ if user_input:
     with st.chat_message("assistant"):
         with st.spinner("🔍 Thinking..."):
             try:
-                llm = get_llm()
-                
-                # Try to search web first
-                search_results = search_web(user_input)
-                
-                # Display search results in sidebar or expander
-                if search_results:
-                    with st.expander("🔍 Web Search Results"):
-                        st.markdown(search_results)
-                
-                # Create prompt
-                if search_results:
-                    prompt = f"""You are a helpful AI assistant. Use the following web search results to answer the question.
+                # Check if it's a simple greeting
+                greetings = ["hi", "hello", "hey", "good morning", "good afternoon", "good evening"]
+                if user_input.lower().strip() in greetings:
+                    response_text = "Hello! How can I help you today? 😊"
+                    st.write(response_text)
+                    st.session_state.messages.append({"role": "assistant", "content": response_text})
+                else:
+                    llm = get_llm()
+                    
+                    # Try to search web first
+                    search_results = search_web(user_input)
+                    
+                    # Display search results in sidebar or expander
+                    if search_results:
+                        with st.expander("🔍 Web Search Results"):
+                            st.markdown(search_results)
+                    
+                    # Create prompt
+                    if search_results:
+                        prompt = f"""You are a helpful AI assistant. Use the following web search results to answer the question.
 
 Search Results:
 {search_results}
 
 Question: {user_input}
 
-Provide a clear answer based on the search results. Include relevant links from the search results in your answer."""
-                else:
-                    prompt = f"You are a helpful AI assistant. Answer this question: {user_input}"
-                
-                # Get response from LLM
-                response = llm.invoke([
-                    SystemMessage(content="You are a helpful assistant."),
-                    HumanMessage(content=prompt)
-                ])
-                
-                st.write(response.content)
-                st.session_state.messages.append({"role": "assistant", "content": response.content})
+Provide a clear and brief answer based on the search results."""
+                    else:
+                        prompt = f"You are a helpful AI assistant. Answer this question briefly: {user_input}"
+                    
+                    # Get response from LLM
+                    response = llm.invoke([
+                        SystemMessage(content="You are a helpful assistant. Keep answers concise and to the point."),
+                        HumanMessage(content=prompt)
+                    ])
+                    
+                    st.write(response.content)
+                    st.session_state.messages.append({"role": "assistant", "content": response.content})
                 
             except Exception as e:
                 error_msg = f"❌ Error: {str(e)}"
