@@ -83,6 +83,11 @@ if user_input:
                 # Try to search web first
                 search_results = search_web(user_input)
                 
+                # Display search results in sidebar or expander
+                if search_results:
+                    with st.expander("🔍 Web Search Results"):
+                        st.markdown(search_results)
+                
                 # Create prompt
                 if search_results:
                     prompt = f"""You are a helpful AI assistant. Use the following web search results to answer the question.
@@ -92,7 +97,7 @@ Search Results:
 
 Question: {user_input}
 
-Provide a clear and concise answer based on the search results."""
+Provide a clear answer based on the search results. Include relevant links from the search results in your answer."""
                 else:
                     prompt = f"You are a helpful AI assistant. Answer this question: {user_input}"
                 
